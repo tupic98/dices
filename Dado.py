@@ -1,7 +1,9 @@
-import wx
 from random import randint
 from time import sleep
 
+import wx
+
+#Creando variables
 i=0
 dado=0
 turn = 0
@@ -16,10 +18,13 @@ loses = 0
 
 class Dice(wx.Frame):
     def __init__(self,*args,**kwargs):
+        # Levantar ventana
         wx.Frame.__init__(self,*args,**kwargs)
         self.Show()
         self.SetBackgroundColour(wx.Colour(0,0,0))
+        # Creando un lienzo para poder empezar a trabajar en el
         panel=wx.Panel(self,-1, pos=(0,0), size=(800,600))
+        # Cambiando el fondo del lienzo a negro
         panel.SetBackgroundColour(wx.Colour(0,0,0))
 
         # Cargando botones
@@ -27,32 +32,42 @@ class Dice(wx.Frame):
         refresh = wx.BitmapButton(
             panel, -1, wx.Bitmap('refreshing.png', wx.BITMAP_TYPE_ANY), wx.Point(368, 463), wx.Size(64, 64), 0);
         refresh.Hide()
+        # Cargando texto
         Perdidas = wx.StaticText(self, id=-1, label="Partidas perdidas: %d" %loses, pos=(550, 400),
                                  size=(200, 50), style=wx.ALIGN_LEFT)
 
         Ganadas = wx.StaticText(self, id=-1, label="Partidas ganadas: %d" %wins, pos=(550, 450),
                                  size=(200, 50), style=wx.ALIGN_LEFT)
+        # CAmbiando color de los textos a blanco
         Perdidas.SetForegroundColour((255,255,255))
         Ganadas.SetForegroundColour((255,255,255))
 
+        # Definiendo funcion para el evento cuando el boton de lanzar dado
         def on_lanzar_listener(event):
             global dado
             global i
             global turn
             turn = turn + 1
             i = 0
+            # Creando un bucle de 8 iteraciones para que el dado "gire" 8 veces
             for i in range(0,8):
+                # Creando un numero al azar para saber que cara del dado mostrat
                 dado = randint(1, 6)
                 print("=============")
                 print(dado)
+                # Llamando funcion de "girar" dado
                 roll_dice(dado)
                 print("=============")
+                # Esto es porque en la iteracion de 8, se genera 8 veces un numero pero solo se llama la funcion de girar 7 veces
+                # entonces solo se toma el septimo valor generado que es en el que se basa que cara del dado se mostrara
                 if i == 6:
                     intent = dado
             print(intent)
             print(turn)
+            # Llamando la funcion para poner en los turnos que lado del dado cayo
             set_dice_turn(intent,turn)
 
+        # Funcion de girar dado
         def roll_dice(turn):
             global dado1verde
             global dado2verde
@@ -60,8 +75,11 @@ class Dice(wx.Frame):
             global dado4verde
             global dado5verde
             global dado6verde
-
+            # Variable turn es para saber que numero se genero para empezar a girar el dado
+            # Dependiendo de que numero es, este muestra la imagen de la cara del dado correspondiente al numero
+            # por 0.1 segundos, para que despues se muestre la siguiente hasta que se acaben las 8 iteraciones
             if turn == 1:
+                # Renderizando imagen de la cara del dado
                 dado1verde = wx.StaticBitmap(panel, -1, wx.Bitmap('1 verde.png', wx.BITMAP_TYPE_ANY),
                                              pos=wx.Point(336, 290), size=(128, 128))
             if turn == 2:
@@ -81,6 +99,7 @@ class Dice(wx.Frame):
                                              pos=wx.Point(336, 290), size=(128, 128))
             sleep(0.10)
 
+        # Definiendo funcion para poner la cara del dao que corresponda a cada turno
         def set_dice_turn(intent, turn):
             global dado1azulfirst, dado2azulfirst, dado3azulfirst, dado4azulfirst, dado5azulfirst, dado6azulfirst
             global dado1azulsecond, dado2azulsecond, dado3azulsecond, dado4azulsecond, dado5azulsecond, dado6azulsecond
@@ -88,12 +107,18 @@ class Dice(wx.Frame):
             global dado1azulfourth, dado2azulfourth, dado3azulfourth, dado4azulfourth, dado5azulfourth, dado6azulfourth
             global intent1, intent2, intent3, intent4
             global win, wins, loses
-
+            # En este, se toma en cuenta que turno es y que cara del dado cayo en la funcion de girar el dado
+            # Solo son 4 turnos, y en cada turno se evalua que cara del dado cayo, y al identificar cual es, este
+            # renderiza la imagen correspondiente a esa cara
             if turn == 1:
+                # Se renderiza texto del primer turno
                 texto = wx.StaticText(panel, id=-1, label="1er tiro", pos=(100, 25), size=(128, 40), style=wx.ALIGN_CENTER)
                 texto.SetForegroundColour((255, 255, 255))
                 if intent == 1:
+                    # Seteando una variable para saber que cara se puso en el turno, para luego ocuparla
+                    # en la funcion de resetear, en donde solo se eliminan las imagenes que se setearon
                     intent1 = 1
+                    # Renderizando imagen del primer turno
                     dado1azulfirst = wx.StaticBitmap(panel, -1, wx.Bitmap('1azul.png', wx.BITMAP_TYPE_ANY),
                                                      pos=wx.Point(100, 75), size=(128, 128))
                 if intent == 2:
@@ -204,6 +229,8 @@ class Dice(wx.Frame):
                     win = win + 1
                     dado6azulfourth = wx.StaticBitmap(panel, -1, wx.Bitmap('6 azul.png', wx.BITMAP_TYPE_ANY),
                                                       pos=wx.Point(550, 75), size=(128, 128))
+            # Si el turno es el ultimo, se entra a la condicional para poder contar si hubo algun 6 en los
+            # intentos y mostrar si se gano o no, ademas de que se muestra el boton de reset
             if turn == 4:
                 if win == 1 or win == 2 or win == 3 or win == 4:
                     wins = wins + 1
@@ -214,12 +241,15 @@ class Dice(wx.Frame):
                 button1.Enable(False)
                 button1.Hide()
                 refresh.Show()
-
+        # Se define la funcion que hara lo que sea necesario para resetear y ya no mostrar nada
         def on_reset(event):
             global turn
             global win
+            # Se resetea auxiliar para contar cuantas veces cayo un 6
             win = 0
+            # Se esconde el boton de reset
             refresh.Hide()
+            # Dependiendo que imagen de la cara del dado este renderizda, oculta estas
             if intent1 == 1:
                 dado1azulfirst.Hide()
             if intent1 == 2:
@@ -268,20 +298,24 @@ class Dice(wx.Frame):
                 dado5azulfourth.Hide()
             if intent4 == 6:
                 dado6azulfourth.Hide()
+            # Oculta las imagenes que se muestran a la hora de "girar" el dado
             dado1verde.Hide()
             dado2verde.Hide()
             dado3verde.Hide()
             dado4verde.Hide()
             dado5verde.Hide()
             dado6verde.Hide()
+            # Mostrar boton de lanzar dado
             button1.Show()
             button1.Enable(True)
+            # Setear los turnos a cero para que empiecen a contar otra vez
             turn = 0
-
+        # Evento del boton lanzar dado
         button1.Bind(wx.EVT_BUTTON, on_lanzar_listener)
+        # Evento del boton reset
         refresh.Bind(wx.EVT_BUTTON, on_reset)
 
-
+# Cosas de wxpython para que se pueda renderizar la ventana
 if __name__ == '__main__':
     app = wx.App()
     fr = Dice(None, -1, "Juego de dados", size=(800 ,600), style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
