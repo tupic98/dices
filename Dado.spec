@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['Dado.py'],
-             pathex=['C:\\Users\\raalv\\PycharmProjects\\untitled1'],
+             pathex=['C:\\Users\\raalv\\PycharmProjects\\Dado'],
              binaries=[],
              datas=[],
              hiddenimports=[],
